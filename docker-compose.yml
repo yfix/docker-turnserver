@@ -1,0 +1,17 @@
+version: "2"
+services:
+  turnserver:
+    image: yfix/turnserver
+    restart: always
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+    environment:
+      - USE_IPV4=1
+      - SKIP_AUTO_IP=1
+    volumes:
+      - /bin/true:/tmp/turnserver.configured:ro
+#      - ./docker/etc/coturn/turnserver.conf:/etc/turnserver.conf
+      - ./docker/var/log/coturn/turnserver.log:/var/log/turnserver.log:ro
+#      - ./docker/etc/nginx/ssl/privkey.pem:/etc/coturn/privkey.pem:ro
+#      - ./docker/etc/nginx/ssl/fullchain.pem:/etc/coturn/fullchain.pem:ro
