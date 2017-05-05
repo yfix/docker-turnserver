@@ -8,4 +8,4 @@ if [ ! -f "/external_ip" ]; then
   fi
 fi
 
-exec /usr/bin/turnserver -n --log-file stdout --external-ip `cat /external_ip`
+exec /usr/bin/turnserver -v --log-file stdout --external-ip `cat /external_ip` -c /etc/turnserver.conf
