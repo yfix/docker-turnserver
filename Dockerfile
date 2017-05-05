@@ -1,5 +1,5 @@
 # based on https://github.com/synctree/docker-coturn/blob/master/Dockerfile
-FROM debian:jessie
+FROM debian:sid
 
 MAINTAINER Yuri Vysotskiy (yfix) <yfix.dev@gmail.com>
 
