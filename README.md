@@ -23,11 +23,3 @@ world and Docker's lack of range-based port mapping (https://github.com/docker/d
 To run this container:
 
     $ docker run -d yfix/turnserver:latest
-
-### Environment Parameters
------------------
-* SKIP_AUTO_IP -- binds to any address, useful for IPv4 and IPv6 dual-stack when also running with --net=host
-* EXTERNAL_IP -- optional manually-specified external IP address
-* PORT -- listening port for STUN and TURN
-* LISTEN_ON_PUBLIC_IP -- bind to the external IP
-* USE_IPV4 -- forces IPv4 when determining the external IP
