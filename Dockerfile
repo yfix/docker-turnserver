@@ -1,24 +1,23 @@
-FROM phusion/baseimage
+# based on https://github.com/synctree/docker-coturn/blob/master/Dockerfile
+FROM debian:jessie
+
 MAINTAINER Yuri Vysotskiy (yfix) <yfix.dev@gmail.com>
 
-# Set correct environment variables.
-ENV HOME /root
+# XXX: Workaround for https://github.com/docker/docker/issues/6345
+RUN ln -s -f /bin/true /usr/bin/chfn
 
-# Use baseimage-docker's init system.
-CMD ["/sbin/my_init"]
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+    coturn \
+    curl \
+    procps \
+  \
+  && apt-get autoremove -y \
+  && apt-get clean -y \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN apt-get update && apt-get dist-upgrade -y
-RUN apt-get install -y gdebi-core
+COPY docker /
+ADD turnserver.sh /turnserver.sh
 
-ENV COTURN_VER v4.5.0.6
-RUN cd /tmp/ && curl -sL http://turnserver.open-sys.org/downloads/v${COTURN_VER}/turnserver-${COTURN_VER}-debian-wheezy-ubuntu-mint-x86-64bits.tar.gz | tar -xzv
+EXPOSE 3478 3478/udp
 
-RUN groupadd turnserver
-RUN useradd -g turnserver turnserver
-RUN gdebi -n /tmp/coturn*.deb
-
-RUN mkdir /etc/service/turnserver
-ADD turnserver.sh /etc/service/turnserver/run
-
-# Clean up APT when done.
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+CMD ["/bin/sh", "/turnserver.sh"]

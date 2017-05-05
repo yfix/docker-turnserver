@@ -1,7 +1,8 @@
 version: "2"
 services:
   turnserver:
-    image: yfix/turnserver
+#    image: yfix/turnserver
+    build: .
     restart: always
     ports:
       - "3478:3478"

@@ -1,34 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
-if [ -z $SKIP_AUTO_IP ] && [ -z $EXTERNAL_IP ]
-then
-    if [ ! -z USE_IPV4 ]
-    then
-        EXTERNAL_IP=`curl -4 icanhazip.com 2> /dev/null`
-    else
-        EXTERNAL_IP=`curl icanhazip.com 2> /dev/null`
-    fi
+if [ ! -f "/external_ip" ]; then
+  if [ -z "$EXTERNAL_IP" ]; then
+      curl http://icanhazip.com 2>/dev/null > /external_ip
+  else
+      echo $EXTERNAL_IP > /external_ip
+  fi
 fi
 
-if [ -z $PORT ]
-then
-    PORT=3478
-fi
-
-if [ ! -e /tmp/turnserver.configured ]
-then
-    if [ -z $SKIP_AUTO_IP ]
-    then
-        echo external-ip=$EXTERNAL_IP > /etc/turnserver.conf
-    fi
-    echo listening-port=$PORT >> /etc/turnserver.conf
-
-    if [ ! -z $LISTEN_ON_PUBLIC_IP ]
-    then
-        echo listening-ip=$EXTERNAL_IP >> /etc/turnserver.conf
-    fi
-
-    touch /tmp/turnserver.configured
-fi
-
-exec /usr/bin/turnserver >>/var/log/turnserver.log 2>&1
+exec /usr/bin/turnserver -n --log-file stdout --external-ip `cat /external_ip`

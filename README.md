@@ -1,21 +1,30 @@
 docker-turnserver
 =================
 
-A Docker container with the Coturn STUN and TURN server (https://github.com/coturn/coturn)
+A Docker container running the coturn STUN/TURN server (https://github.com/coturn/coturn)
 
-This is currently running v4.4.5.3.
+Unlike bprodoehl/turnserver (https://github.com/bprodoehl/docker-turnserver),
+this image is not based on phusion/baseimage, but runs the turnserver directly
+in the container as PID 1. All logging is send to stdout.
 
-```
-docker run -d --name=turnserver --restart="on-failure:10" --net=host -p 3478:3478 -p 3478:3478/udp bprodoehl/turnserver
-```
+Like bprodoehl/turnserver, this container accepts the `EXTERNAL_IP` environment
+variable to tell coturn its external IP address. If `EXTERNAL_IP` is not
+supplied, the external IP will be fetched using icanhazip
+(http://major.io/icanhazip-com-faq/) using curl.
 
-This will use icanhazip (http://major.io/icanhazip-com-faq/) to determine your container's public IP address. If you don't wish to use icanhazip, or you wish to use an external IP address that doesn't match what icanhazip would see, you can specify it in the environment:
+For debugging purposes, [`docker exec`](https://docs.docker.com/reference/commandline/cli/#exec)
+should be used since this container does not run an SSH daemon.
 
-```
-docker run -d -e EXTERNAL_IP=1.2.3.4 --name=turnserver --restart="on-failure:10" --net=host -p 3478:3478 -p 3478:3478/udp bprodoehl/turnserver
-```
+Due to the need for the TURN server to open arbitrary ports to the outside
+world and Docker's lack of range-based port mapping (https://github.com/docker/docker/issues/8899), additional configuration is needed to allow clients to talk to this service. This can be accomplished in a number of ways, including the use of `iptables` in combination with something like [`docker-gen`](https://github.com/jwilder/docker-gen) or using Docker's host networking (`--net host`) feature. The use of host networking is not recommended due to the many security issues it raises.
 
-Environment Parameters
+### Usage
+
+To run this container:
+
+    $ docker run -d yfix/turnserver:latest
+
+### Environment Parameters
 -----------------
 * SKIP_AUTO_IP -- binds to any address, useful for IPv4 and IPv6 dual-stack when also running with --net=host
 * EXTERNAL_IP -- optional manually-specified external IP address
